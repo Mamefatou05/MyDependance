@@ -37,12 +37,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authz -> {
-                    for (String path : getPublicPaths()) {
-                        authz.requestMatchers(path).permitAll();
-                    }
-                    authz.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(authz -> authz
+                        // Exclure les routes contenant swagger, login, ou register
+                        .requestMatchers("/**/swagger/**", "/**/login/**", "/**/register/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedHandler))
